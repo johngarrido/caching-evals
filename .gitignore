@@ -1,0 +1,39 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+
+# Virtual environments
+.venv/
+
+# Run records: each run writes its own, none are committed
+runs/
+*.jsonl
+
+# Credentials and local env: never committed
+.env
+.env.*
+*.pem
+*.key
+*.p12
+credentials*.json
+service-account*.json
+*-sa.json
+application_default_credentials.json
+
+# Editor / OS / local agent state
+.DS_Store
+.vscode/
+.idea/
+.claude/
+.gemini/
+.agent/
+.impeccable/
+
+# Agent instruction files: never committed
+CLAUDE.md
+CLAUDE.local.md
+**/CLAUDE.md
+AGENTS.md
+**/AGENTS.md
+GEMINI.md
+**/GEMINI.md

@@ -1,0 +1,13 @@
+[project]
+name = "vertex-caching-evals"
+version = "0.2.0"
+description = "Harness for measuring Gemini implicit context caching (prefix reuse) on Vertex AI."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "google-auth>=2.62.0",
+    "google-genai>=2.31.0",
+]
+
+[tool.uv]
+package = false
