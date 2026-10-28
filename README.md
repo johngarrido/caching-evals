@@ -1,4 +1,4 @@
-# vertex-caching-evals
+# caching-evals
 
 A small harness for measuring **implicit context caching** on **Vertex AI**: how often Gemini
 actually reuses a large shared leading prefix, and whether a given setting (model, location,
