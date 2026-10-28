@@ -82,7 +82,7 @@ Other variations:
 ./run.sh --project YOUR_PROJECT_ID                 # both arms, 5 trials each
 ./run.sh --project YOUR_PROJECT_ID --reps 10
 ./run.sh --project YOUR_PROJECT_ID --settle-ms 30000      # widen the gap between the two requests
-./run.sh --project YOUR_PROJECT_ID --model gemini-3.8-flash --location us-central1
+./run.sh --project YOUR_PROJECT_ID --model gemini-3.5-flash --location us-central1
 ./run.sh --project YOUR_PROJECT_ID --api-version v1       # pin the Vertex apiVersion
 ./run.sh --project YOUR_PROJECT_ID --surfaces vertex      # one arm only
 ./run.sh --dry-run                                 # no API calls, a synthetic run for the workbench
@@ -93,7 +93,7 @@ Other variations:
 |---|---|---|
 | `--project` | `$GOOGLE_CLOUD_PROJECT` / ADC | GCP project id |
 | `--api-key` | `$VERTEX_API_KEY` | Vertex AI API key, used instead of ADC (see above) |
-| `--model` | `gemini-3.5-flash` | Model under test |
+| `--model` | `gemini-3.8-flash` | Model under test |
 | `--location` | `global` | Vertex AI location |
 | `--api-version` | unset (SDK default) | Vertex apiVersion, e.g. `v1`, `v1beta1` |
 | `--surfaces` | `vertex,vertex_interactions` | Arms to run (see below) |
@@ -164,9 +164,8 @@ Expanding an arm shows every trial's token counts plus the **measured** CASE→P
 count. A gap noticeably longer than the configured settle (e.g. after a 429 backoff) is
 highlighted.
 
-It deliberately will not show a point estimate where the sample only supports an interval, or a
-dollar figure you didn't give it. Token prices go into the cost panel by hand and stay in your
-browser's localStorage. It holds no credentials and cannot start a run.
+It deliberately will not show a point estimate where the sample only supports an interval. It
+holds no credentials and cannot start a run.
 
 ## Method
 
@@ -191,9 +190,9 @@ every trial start cold, and trials never contaminate each other.
 - **Order**: by default arms are **interleaved**. Each round runs one trial of every arm, in a
   shuffled order, so drift in serving conditions during the run lands evenly on all arms.
   `--order blocked` runs each arm's trials back to back instead.
-- **Held constant**: a fixed `system_instruction`, `temperature=0`, minimal thinking,
-  `max_output_tokens=1024` (room for the short answer to finish, since a cut-off interaction
-  cannot be chained), and **no `cached_content`**. Only implicit caching is measured, never explicit.
+- **Held constant**: a fixed `system_instruction`, `temperature=0`, thinking left at the model's
+  API default, `max_output_tokens=1024` (room for the short answer to finish, since a cut-off
+  interaction cannot be chained), and **no `cached_content`**. Only implicit caching is measured, never explicit.
 
 ## Reading a result
 
