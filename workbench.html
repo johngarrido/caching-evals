@@ -33,7 +33,6 @@
   --plate-hit:#6FBF8F;      /* run complete */
   --plate-canary:#F3E9A8;   /* run in progress */
   --plate-red:#E06B62; --plate-red-ink:#F7C9C4;        /* synthetic: no API was called */
-  --plate-olive:#8E8558; --plate-olive-ink:#EDE3AE;    /* imported from an earlier harness */
 
   /* Surfaces that lift off the paper on interaction. */
   --carbon-hover:#38342C; --row-hover:#EFEEE9; --row-open:#EAE8E1;
@@ -90,7 +89,6 @@ h1 small{display:block; font-family:var(--mono); font-size:12.5px; font-weight:4
   font-size:11.5px; font-weight:600; letter-spacing:.04em;
   padding:2px 9px 3px; border-radius:2px; border:1px solid var(--plate-red); color:var(--plate-red-ink);
 }
-.stamp.imported{border-color:var(--plate-olive); color:var(--plate-olive-ink)}
 .fields{
   display:grid; grid-template-columns:repeat(auto-fit,minmax(128px,1fr));
   margin:20px -32px 0; border-top:1px solid var(--plate-rule);
@@ -341,7 +339,7 @@ footer .val{font-size:12.5px; color:var(--ink-2)}
   .fields,.fields div{border-color:var(--rule-2)}
   .counter .n .sep,.counter .n #allocated{color:var(--ink-2)}
   /* The reversed plate's badge colours are set for carbon; on paper they need paper contrast. */
-  .stamp,.stamp.imported{color:var(--carbon); border-color:var(--rule-2); background:none}
+  .stamp{color:var(--carbon); border-color:var(--rule-2); background:none}
   .status,.status.running,.status.complete{color:var(--ink-2)}
   .status::before,.status.running::before,.status.complete::before{background:var(--ink-2)}
   tr.detail{display:table-row}
@@ -547,8 +545,7 @@ function renderPlate() {
   const stamps = $("#stamps");
   stamps.replaceChildren();
   if (p.synthetic) stamps.append(el("span", "stamp", "Synthetic: no API was called"));
-  if (p.imported_from) stamps.append(el("span", "stamp imported", "Imported from " + p.imported_from));
-  $("#src").textContent = p.imported_from ? p.imported_from : run ? "runs/" + run.run_id + ".jsonl" : "—";
+  $("#src").textContent = run ? "runs/" + run.run_id + ".jsonl" : "—";
 }
 
 /* ---- arms table ------------------------------------------------------ */

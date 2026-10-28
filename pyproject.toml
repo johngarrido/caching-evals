@@ -1,5 +1,5 @@
 [project]
-name = "vertex-caching-evals"
+name = "caching-evals"
 version = "0.2.0"
 description = "Harness for measuring Gemini implicit context caching (prefix reuse) on Vertex AI."
 readme = "README.md"

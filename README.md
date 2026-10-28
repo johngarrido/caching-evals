@@ -15,6 +15,20 @@ synthetic. No real data is sent.
 
 ---
 
+## Quick start
+
+```bash
+git clone https://github.com/cloud-gtm/caching-evals.git
+cd caching-evals
+uv sync
+
+gcloud auth application-default login
+./run.sh --dry-run                                         # check the setup, no API calls
+./run.sh --surfaces vertex --reps 10 --project YOUR_PROJECT_ID
+```
+
+Then open the results in the [workbench](#the-workbench).
+
 ## Prerequisites
 
 - Python 3.11+ and [`uv`](https://docs.astral.sh/uv/)
@@ -57,9 +71,9 @@ export VERTEX_API_KEY=...        # prefer this over --api-key, which lands in sh
 
 The key must be a **Vertex AI** API key, and it is read only from `VERTEX_API_KEY` or `--api-key`.
 Other key variables that may be in your environment (`GOOGLE_API_KEY`, `GEMINI_API_KEY`) are
-ignored, so they can't silently switch a run off ADC. The run record
-stores which auth mode was used (`adc` or `api_key`), never the key. A 401/403 stops the run at
-the first request instead of excluding every trial.
+ignored, so they can't silently switch a run off ADC. The run record stores which auth mode was
+used (`adc` or `api_key`), never the key. A 401/403 stops the run at the first request instead of
+excluding every trial.
 
 ## Running it
 
@@ -193,7 +207,8 @@ every trial start cold, and trials never contaminate each other.
   `--order blocked` runs each arm's trials back to back instead.
 - **Held constant**: a fixed `system_instruction`, `temperature=0`, thinking left at the model's
   API default, `max_output_tokens=1024` (room for the short answer to finish, since a cut-off
-  interaction cannot be chained), and **no `cached_content`**. Only implicit caching is measured, never explicit.
+  interaction cannot be chained), and **no `cached_content`**. Only implicit caching is measured,
+  never explicit.
 
 ## Reading a result
 
@@ -201,7 +216,7 @@ every trial start cold, and trials never contaminate each other.
   The workbench only calls an arm reliable or unreliable once its interval clears the 50% line.
 - Implicit caching is **best-effort and serving-side**. It can move with the model version,
   region, or time without any change on your side. Record the model, location, SDK version and date
-  with any result you keep. The run record and workbench plate capture all of these.
+  with any result you keep. The run record and the workbench header capture all of these.
 - Compare `vertex` against `vertex` and chained against chained.
 
 ## Layout
