@@ -190,9 +190,9 @@ every trial start cold, and trials never contaminate each other.
 - **Order**: by default arms are **interleaved**. Each round runs one trial of every arm, in a
   shuffled order, so drift in serving conditions during the run lands evenly on all arms.
   `--order blocked` runs each arm's trials back to back instead.
-- **Held constant**: a fixed `system_instruction`, `temperature=0`, minimal thinking,
-  `max_output_tokens=1024` (room for the short answer to finish, since a cut-off interaction
-  cannot be chained), and **no `cached_content`**. Only implicit caching is measured, never explicit.
+- **Held constant**: a fixed `system_instruction`, `temperature=0`, thinking left at the model's
+  API default, `max_output_tokens=1024` (room for the short answer to finish, since a cut-off
+  interaction cannot be chained), and **no `cached_content`**. Only implicit caching is measured, never explicit.
 
 ## Reading a result
 

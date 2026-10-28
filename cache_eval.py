@@ -60,11 +60,9 @@ TAIL_A = '### TASK A\nExtract the key facts and list the open issues. JSON: {fac
 TAIL_B = '### TASK B\nBased on the SAME context above, produce a plan. JSON: {title, steps}.'
 
 # Output is not what is measured, but it has to finish. A chained turn cannot start from an
-# interaction that was cut off (status 'incomplete': "can't start a new turn"), and on thinking
-# models a small cap is spent on thought tokens before any answer. So thinking is held at minimal
-# and the cap leaves room for the short JSON answer, identically on both arms.
+# interaction that was cut off (status 'incomplete': "can't start a new turn"), and thinking
+# (left at the model's API default) spends this budget before any answer is written.
 MAX_OUTPUT_TOKENS = 1024
-THINKING_LEVEL = 'minimal'
 
 # Bump when the shape of a run record changes, so the workbench can refuse a file it cannot read.
 RUN_SCHEMA = 1
@@ -365,7 +363,6 @@ def generate(client: Any, model: str, contents: List[types.Content], max_out: in
         system_instruction=SYSTEM,
         temperature=0.0,
         max_output_tokens=max_out,
-        thinking_config=types.ThinkingConfig(thinking_level=THINKING_LEVEL.upper()),
         http_options=types.HttpOptions(extra_body=body) if body else None,
     )
     response, retries, started = call_with_retry(lambda: client.models.generate_content(
@@ -383,8 +380,7 @@ def interact(client: Any, model: str, max_out: int, is_plan: bool, **kwargs: Any
     turn, retries, started = call_with_retry(lambda: client.interactions.create(
         model=model,
         system_instruction=SYSTEM,
-        generation_config={'max_output_tokens': max_out, 'temperature': 0.0,
-                           'thinking_level': THINKING_LEVEL},
+        generation_config={'max_output_tokens': max_out, 'temperature': 0.0},
         store=True,
         **kwargs,
     ))
@@ -490,7 +486,6 @@ def main() -> None:
         'prefix_lines': prefix_lines,
         'max_output_tokens': max_out,
         'temperature': 0.0,
-        'thinking_level': THINKING_LEVEL,
         'surfaces': surfaces,
         'order': args.order,
         'session_affinity': session_id,

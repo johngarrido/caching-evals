@@ -515,7 +515,6 @@ const PROTOCOL_FIELDS = [
   ["Allocation / arm", p => p.reps], ["Settle", p => p.settle_ms == null ? null : p.settle_ms + " ms"],
   ["Prefix lines", p => p.prefix_lines == null ? null : fmt(p.prefix_lines)],
   ["Max output", p => p.max_output_tokens], ["Temperature", p => p.temperature],
-  ["Thinking", p => p.thinking_level],
   ["SDK", p => p.sdk_version ? p.sdk + " " + p.sdk_version : p.sdk],
   ["Session affinity", p => p.session_affinity == null ? null
     : p.session_affinity ? "on · " + p.session_affinity : "off"],
