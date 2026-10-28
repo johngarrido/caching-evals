@@ -55,8 +55,9 @@ export VERTEX_API_KEY=...        # prefer this over --api-key, which lands in sh
   mode has no Interactions API route, so asking for `vertex_interactions` there stops the run with
   an explanation.
 
-Only `VERTEX_API_KEY` / `--api-key` is read. `GOOGLE_API_KEY` and `GEMINI_API_KEY` are ignored, so a
-Gemini API key already in your environment can't silently switch a run off ADC. The run record
+The key must be a **Vertex AI** API key, and it is read only from `VERTEX_API_KEY` or `--api-key`.
+Other key variables that may be in your environment (`GOOGLE_API_KEY`, `GEMINI_API_KEY`) are
+ignored, so they can't silently switch a run off ADC. The run record
 stores which auth mode was used (`adc` or `api_key`), never the key. A 401/403 stops the run at
 the first request instead of excluding every trial.
 

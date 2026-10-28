@@ -72,8 +72,8 @@ AUTH_HINT = ('Authenticate with Application Default Credentials (the default):\n
              'and pass --project (or set GOOGLE_CLOUD_PROJECT).\n'
              'Or use a Vertex AI API key instead: set VERTEX_API_KEY (or pass --api-key).')
 
-# Read only from this variable or --api-key, never from GOOGLE_API_KEY / GEMINI_API_KEY, so a Gemini
-# API (AI Studio) key that happens to be in the environment can never silently switch the run off ADC.
+# A Vertex AI API key, read only from this variable or --api-key. GOOGLE_API_KEY / GEMINI_API_KEY are
+# deliberately ignored, so an unrelated key in the environment can never silently switch the run off ADC.
 API_KEY_ENV = 'VERTEX_API_KEY'
 
 Usage = Dict[str, Optional[float]]
