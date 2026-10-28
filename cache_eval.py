@@ -177,7 +177,7 @@ def parse_args() -> argparse.Namespace:
                              '--project it authenticates the normal project endpoints; without one it '
                              'runs in express mode (global, vertex arm only). Prefer the env var: the '
                              'flag lands in shell history.')
-    parser.add_argument('--model', default='gemini-3.5-flash', help='Model to evaluate (default: gemini-3.5-flash)')
+    parser.add_argument('--model', default='gemini-3.8-flash', help='Model to evaluate (default: gemini-3.8-flash)')
     parser.add_argument('--location', default='global', help='Vertex AI location (default: global)')
     parser.add_argument('--api-version', default='',
                         help='Vertex apiVersion, e.g. v1 or v1beta1 (default: unset, the SDK default)')

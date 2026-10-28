@@ -277,29 +277,11 @@ table.trials td.drift{color:var(--amber); font-weight:600}
 /* ---- panels: the plies, reduced to a rule ---------------------------- */
 .panel{margin-top:14px; padding:18px 20px 20px; border:1px solid var(--rule-2); border-radius:3px; background:var(--paper)}
 .panel.exclusions{border-top:3px solid var(--pink-edge)}
-.panel.costing{border-top:3px solid var(--canary-edge)}
 .panel h3{margin:0 0 11px; font-size:13px; font-weight:600}
 .panel table{margin:0}
 .panel tbody tr:nth-child(odd) td{background:var(--zebra)}
 .clear{font-family:var(--mono); font-size:13px; color:var(--ink-2); margin:0}
 
-.rates{display:flex; gap:20px; flex-wrap:wrap; align-items:flex-end; margin-bottom:16px}
-.unsupplied{
-  display:flex; align-items:center; gap:9px; margin:0;
-  font-size:13px; font-weight:500; color:var(--amber);
-}
-.unsupplied::before{
-  content:""; width:13px; height:13px; border:1.5px dashed var(--canary-edge);
-  border-radius:2px; flex:0 0 auto;
-}
-.costgrid{display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:18px 26px}
-.costgrid .val{font-size:19px; font-weight:500}
-.costgrid .val.saving{color:var(--hit)}
-.band{font-family:var(--mono); font-size:12.5px; color:var(--ink-2)}
-.proj{margin-top:18px; padding-top:15px; border-top:1px solid var(--rule)}
-.proj .band{display:flex; justify-content:space-between; gap:20px; max-width:430px; padding:3px 0}
-.proj .band b{font-weight:500; color:var(--blue)}
-.proj .band .unsized{font-family:var(--sans); font-style:normal; font-size:12.5px; color:var(--amber)}
 
 /* ---- empty state ----------------------------------------------------- */
 .dropzone{
@@ -430,11 +412,6 @@ footer .val{font-size:12.5px; color:var(--ink-2)}
     <div id="ledger"></div>
   </section>
 
-  <section>
-    <h2>Cost projection<span class="meta">Rates are yours; none ship with this file</span></h2>
-    <div id="costing"></div>
-  </section>
-
   <footer>
     <span><span class="lbl">Source</span><span class="val" id="src">—</span></span>
     <span><span class="lbl">Harness</span><span class="val">cache_eval.py</span></span>
@@ -459,7 +436,7 @@ const svgEl = (t, attrs) => {
 const thead = row => { const h = document.createElement("thead"); h.append(row); return h; };
 const fmt = n => n == null ? "—" : n.toLocaleString("en-US");
 
-const state = { index: [], current: null, baseline: null, served: false, seen: new Set(), rates: {},
+const state = { index: [], current: null, baseline: null, served: false, seen: new Set(),
   // Survive the live poll's redraw: which arms are opened up, and the last bytes each slot rendered.
   open: new Set(), raw: {} };
 
@@ -919,110 +896,6 @@ function renderLedger() {
   host.append(panel);
 }
 
-/* ---- cost projection: rates are the reader's, never ours ------------- */
-
-function renderCosting() {
-  const host = $("#costing");
-  // Rates belong to the reader, not the run: rebuilding the fields on every live poll would eat keystrokes.
-  if (host.querySelector(".costresults")) { updateCosting(); return; }
-  const panel = el("div", "panel costing");
-  panel.append(el("h3", null, "Cost projection"));
-
-  const rates = el("div", "rates");
-  const mk = (id, label, placeholder) => {
-    const f = el("div", "field");
-    const l = el("label", "lbl", label);
-    l.setAttribute("for", id);
-    const i = el("input");
-    i.type = "number"; i.id = id; i.min = "0"; i.step = "any"; i.placeholder = placeholder;
-    if (state.rates[id] != null) i.value = state.rates[id];
-    // Only the results below are redrawn, so the field the user is typing in keeps its caret.
-    i.addEventListener("input", () => {
-      state.rates[id] = i.value === "" ? null : Number(i.value);
-      try { localStorage.setItem("cacheEvalRates", JSON.stringify(state.rates)); } catch {}
-      updateCosting();
-    });
-    f.append(l, i);
-    return f;
-  };
-  rates.append(
-    mk("priceIn", "Prompt tokens, $ / 1M", "0.00"),
-    mk("priceCached", "Cached prompt tokens, $ / 1M", "0.00"),
-    mk("volume", "Requests / month at this prefix", "0")
-  );
-  panel.append(rates, el("div", "costresults"));
-  host.replaceChildren(panel);
-  updateCosting();
-}
-
-function updateCosting() {
-  const out = document.querySelector(".costresults");
-  if (!out) return;
-  out.replaceChildren();
-
-  const run = state.current;
-  const pin = state.rates.priceIn, pc = state.rates.priceCached;
-  if (pin == null || pc == null || !run) {
-    out.append(el("p", "unsupplied", "Rates not supplied: no figure shown"));
-    out.append(el("p", "note",
-      "No pricing ships in this file. Enter the rates from your own billing page; they stay in this browser."));
-    return;
-  }
-
-  let full = 0, cached = 0, requests = 0;
-  for (const a of run.arms.values()) for (const t of a.trials) for (const u of [t.case, t.plan]) {
-    if (!u || u.prompt == null) continue;
-    requests++;
-    cached += u.cached || 0;
-    full += u.prompt - (u.cached || 0);
-  }
-  const total = full + cached;
-  const billed = (full * pin + cached * pc) / 1e6;
-  const saved = (total * pin) / 1e6 - billed;
-
-  const grid = el("div", "costgrid");
-  const stat = (label, value, hint, cls) => {
-    const d = el("div");
-    d.append(el("span", "lbl", label), el("span", "val " + (cls || ""), value));
-    if (hint) d.append(el("div", "band", hint));
-    return d;
-  };
-  grid.append(
-    stat("Prompt tokens this run", fmt(total)),
-    stat("Served from cache", fmt(cached), total ? (cached / total * 100).toFixed(1) + "% of prompt tokens" : null),
-    stat("Billed at your rates", "$" + billed.toFixed(4)),
-    stat("Saved against no cache", "$" + saved.toFixed(4), null, saved > 0 ? "saving" : "")
-  );
-  out.append(grid);
-
-  const vol = state.rates.volume;
-  if (!vol || !requests) return;
-  const perReq = total / requests;
-  const proj = el("div", "proj");
-  proj.append(el("span", "lbl", "Projected monthly saving at " + fmt(vol) + " requests"));
-  let any = false;
-  for (const a of run.arms.values()) {
-    const t = tally(a, run.protocol ? run.protocol.reps : 0);
-    if (!t.analysed) continue;
-    any = true;
-    const row = el("div", "band");
-    row.append(el("span", null, a.name));
-    if (t.meanCachedOfHits == null) {
-      // Zero hits means the saving per hit is unmeasured, not zero. Saying $0.00 would invent a figure.
-      row.append(el("i", "unsized", "no hit observed; saving cannot be sized at this N"));
-    } else {
-      const perHit = perReq * t.meanCachedOfHits / 100 * (pin - pc) / 1e6;
-      row.append(el("b", null, "$" + (perHit * t.ci.lo * vol).toFixed(2) +
-        " – $" + (perHit * t.ci.hi * vol).toFixed(2)));
-    }
-    proj.append(row);
-  }
-  if (!any) return;
-  proj.append(el("p", "note", "Stated as a range across the 95% interval on each arm's hit rate, because a point " +
-    "estimate at this sample size would claim a precision the run does not have."));
-  out.append(proj);
-}
-
 /* ---- empty state ----------------------------------------------------- */
 
 function emptyState() {
@@ -1042,7 +915,7 @@ function emptyState() {
   return d;
 }
 
-function renderAll() { renderPlate(); renderArms(); renderLedger(); renderCosting(); }
+function renderAll() { renderPlate(); renderArms(); renderLedger(); }
 
 /* ---- loading --------------------------------------------------------- */
 
@@ -1096,8 +969,6 @@ function tick() {
 }
 
 async function boot() {
-  try { state.rates = JSON.parse(localStorage.getItem("cacheEvalRates") || "{}") || {}; } catch { state.rates = {}; }
-
   const list = await discover();
   state.served = list !== null;
   if (list) {
