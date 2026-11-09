@@ -28,6 +28,7 @@ application_default_credentials.json
 .gemini/
 .agent/
 .impeccable/
+.hermes/
 
 # Agent instruction files: never committed
 CLAUDE.md
